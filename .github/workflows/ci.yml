@@ -9,8 +9,8 @@ jobs:
       flake-checks: "${{ steps.set-outputs.outputs.checks }}"
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v27
-      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - uses: cachix/install-nix-action@8887e596b4ee1134dae06b98d573bd674693f47c
+      - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b
       - run: >
           nix flake show --json 
           | jq -rc '.checks["x86_64-linux"] 
@@ -24,8 +24,8 @@ jobs:
       flake-checks: "${{ steps.set-outputs.outputs.checks }}"
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v27
-      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - uses: cachix/install-nix-action@8887e596b4ee1134dae06b98d573bd674693f47c
+      - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b
       - run: nix build
 
   flake-checks:
@@ -36,8 +36,8 @@ jobs:
         check: ${{ fromJSON(needs.get-flake-checks.outputs.flake-checks) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v27
-      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - uses: cachix/install-nix-action@8887e596b4ee1134dae06b98d573bd674693f47c
+      - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b
       - run: nix build -L ".#checks.$check"
         env:
           check: "${{ matrix.check }}"
