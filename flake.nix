@@ -68,27 +68,27 @@
           # Note that this is done as a separate derivation so that
           # we can block the CI if there are issues here, but not
           # prevent downstream consumers from building our crate by itself.
-          webkit-pdf-inator-clippy = craneLib.cargoClippy (commonArgs // {
+          cargo-clippy = craneLib.cargoClippy (commonArgs // {
             inherit cargoArtifacts;
             cargoClippyExtraArgs = "--all-targets -- --deny warnings";
           });
 
-          webkit-pdf-inator-doc = craneLib.cargoDoc (commonArgs // {
+          cargo-doc = craneLib.cargoDoc (commonArgs // {
             inherit cargoArtifacts;
           });
 
-          webkit-pdf-inator-fmt = craneLib.cargoFmt {
+          cargo-fmt = craneLib.cargoFmt {
             inherit src;
           };
 
-          webkit-pdf-inator-deny = craneLib.cargoDeny {
+          cargo-deny = craneLib.cargoDeny {
             inherit src;
           };
 
           # Run tests with cargo-nextest
           # Consider setting `doCheck = false` on `webkit-pdf-inator` if you do not want
           # the tests to run twice
-          webkit-pdf-inator-nextest = craneLib.cargoNextest (commonArgs // {
+          nextest = craneLib.cargoNextest (commonArgs // {
             inherit cargoArtifacts;
             partitions = 1;
             partitionType = "count";
