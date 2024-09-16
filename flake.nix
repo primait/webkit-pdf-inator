@@ -36,21 +36,16 @@
           strictDeps = true;
 
           nativeBuildInputs = with pkgs; [
-            gcc
             pkg-config
           ];
 
           buildInputs = with pkgs; [
             gtk4
             glib-networking
-            cmake
             webkitgtk_6_0
             libsoup
-            stdenv
             openssl
             glibc
-            libsoup
-            cairo
           ];
         };
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
