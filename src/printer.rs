@@ -15,7 +15,8 @@ impl PrintConfig {
     }
 
     pub async fn print(self, webview: &WebView) -> Result<()> {
-        let output_uri = Url::from_file_path(self.output_file).unwrap();
+        let file = std::path::absolute(self.output_file)?;
+        let output_uri = Url::from_file_path(file).unwrap();
         let print_op = PrintOperation::new(webview);
 
         let settings = PrintSettings::new();
@@ -30,7 +31,7 @@ impl PrintConfig {
             if let Some(s) = s.take() {
                 s.send(()).unwrap();
             } else {
-                eprintln!(
+                tracing::warn!(
                     "print operation connect_finished called multiple times. This shouldn't happen"
                 );
             };

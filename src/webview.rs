@@ -1,6 +1,6 @@
 use anyhow::Result;
 use futures::channel::oneshot::{self, Sender};
-use gtk4::{prelude::*, Application, ApplicationWindow};
+use gtk4::{prelude::*, ApplicationWindow};
 use std::cell::Cell;
 use webkit6::{prelude::*, LoadEvent, WebView};
 
@@ -9,11 +9,10 @@ pub struct WebviewConfig {
 }
 
 impl WebviewConfig {
-    pub async fn run(self, app: &Application) -> Result<WebView> {
+    pub async fn run(self, window: &ApplicationWindow) -> Result<WebView> {
         let webview = WebView::new();
         webview.load_uri(&self.uri);
 
-        let window = ApplicationWindow::new(app);
         window.set_child(Some(&webview));
         let (s, r) = oneshot::channel();
 
@@ -30,7 +29,7 @@ impl WebviewConfig {
             if let Some(s) = s.take() {
                 s.send(()).unwrap();
             } else {
-                eprintln!("connect_load_changed called multiple times. This shouldn't happen");
+                tracing::warn!("connect_load_changed called multiple times. This shouldn't happen");
             };
         });
 
