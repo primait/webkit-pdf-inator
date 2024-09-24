@@ -21,6 +21,7 @@
   };
 
   outputs = { self, nixpkgs, crane, fenix, flake-utils, advisory-db, ... }:
+    # TODO: cross compilation
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
