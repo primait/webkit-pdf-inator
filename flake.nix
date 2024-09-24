@@ -37,15 +37,15 @@
 
           nativeBuildInputs = with pkgs; [
             pkg-config
+            wrapGAppsHook4
           ];
 
           buildInputs = with pkgs; [
-            gtk4
-            glib-networking
             webkitgtk_6_0
             libsoup
             openssl
             glibc
+            glib-networking
           ];
         };
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
@@ -100,6 +100,8 @@
 
         devShells.default = craneLib.devShell {
           checks = self.checks.${system};
+
+          GIO_EXTRA_MODULES = "${pkgs.glib-networking}/lib/gio/modules";
         };
       });
 }
