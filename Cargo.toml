@@ -14,6 +14,7 @@ publish = false
 anyhow = "1.0.89"
 clap = { version = "4.5.17", features = ["derive", "unicode"] }
 futures = "0.3.30"
+glib = { version = "0.20.3", features = ["log"] }
 glib-macros = "0.20.3"
 gtk4 = "0.9.0"
 tracing = "0.1.40"

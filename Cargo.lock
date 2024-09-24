@@ -383,6 +383,7 @@ dependencies = [
  "glib-sys",
  "gobject-sys",
  "libc",
+ "log",
  "memchr",
  "smallvec",
 ]
@@ -1136,6 +1137,7 @@ dependencies = [
  "anyhow",
  "clap",
  "futures",
+ "glib",
  "glib-macros",
  "gtk4",
  "tracing",
