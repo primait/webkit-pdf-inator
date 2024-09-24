@@ -1,4 +1,4 @@
-use clap::{ValueEnum, Parser};
+use clap::{Parser, ValueEnum};
 use gtk4::PageOrientation;
 use std::path::PathBuf;
 use url::Url;
@@ -37,14 +37,14 @@ pub struct Args {
 #[derive(ValueEnum, Debug, Clone, Parser)]
 pub enum Orientation {
     Portrait,
-    Landscape
+    Landscape,
 }
 
-impl Into<PageOrientation> for Orientation {
-    fn into(self) -> PageOrientation {
-        match self {
-            Self::Portrait => PageOrientation::Portrait,
-            Self::Landscape => PageOrientation::Landscape
+impl From<Orientation> for PageOrientation {
+    fn from(orientation: Orientation) -> PageOrientation {
+        match orientation {
+            Orientation::Portrait => PageOrientation::Portrait,
+            Orientation::Landscape => PageOrientation::Landscape,
         }
     }
 }

@@ -13,7 +13,10 @@ pub struct PrintConfig {
 }
 impl PrintConfig {
     pub fn new(output_file: PathBuf, orientation: Orientation) -> Self {
-        Self { output_file, orientation }
+        Self {
+            output_file,
+            orientation,
+        }
     }
 
     pub async fn print(self, webview: &WebView) -> Result<()> {
