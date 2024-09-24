@@ -26,7 +26,7 @@ async fn do_print(args: Args, window: ApplicationWindow) -> Result<()> {
     };
     let webview = webview_cfg.run(&window).await?;
 
-    printer::PrintConfig::new(args.output_file.clone())
+    printer::PrintConfig::new(args.output_file.clone(), args.orientation)
         .print(&webview)
         .await?;
 

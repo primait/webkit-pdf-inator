@@ -1,8 +1,9 @@
-use clap::Parser;
+use clap::{ValueEnum, Parser};
+use gtk4::PageOrientation;
 use std::path::PathBuf;
 use url::Url;
 
-#[derive(Clone, Parser)]
+#[derive(Debug, Clone, Parser)]
 pub struct Args {
     #[arg(
         name = "file",
@@ -26,6 +27,24 @@ pub struct Args {
     /// support. You are responsible for sanitizing them to prevent these issues
     pub input_url: Option<Url>,
 
+    #[arg(long, default_value = "portrait")]
+    pub orientation: Orientation,
+
     #[arg(default_value = "output.pdf")]
     pub output_file: PathBuf,
+}
+
+#[derive(ValueEnum, Debug, Clone, Parser)]
+pub enum Orientation {
+    Portrait,
+    Landscape
+}
+
+impl Into<PageOrientation> for Orientation {
+    fn into(self) -> PageOrientation {
+        match self {
+            Self::Portrait => PageOrientation::Portrait,
+            Self::Landscape => PageOrientation::Landscape
+        }
+    }
 }
