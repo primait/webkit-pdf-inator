@@ -11,7 +11,13 @@ pub struct WebviewConfig {
 
 impl WebviewConfig {
     pub async fn run(self, window: &ApplicationWindow) -> Result<WebView> {
-        let webview = WebView::new();
+        let settings = webkit6::Settings::builder()
+            // TODO: make these customizeable
+            .allow_file_access_from_file_urls(false)
+            .allow_universal_access_from_file_urls(false)
+            .enable_javascript(false)
+            .build();
+        let webview = WebView::builder().settings(&settings).build();
         webview.load_uri(&self.uri);
 
         window.set_child(Some(&webview));
