@@ -1,9 +1,9 @@
+use anyhow::Result;
 use clap::Parser;
 use tracing_subscriber::{fmt, prelude::*, EnvFilter};
-use webkit6::glib;
 use webkit_pdf_inator::args::Args;
 
-fn main() -> glib::ExitCode {
+fn main() -> Result<()> {
     tracing_subscriber::registry()
         .with(fmt::layer())
         .with(EnvFilter::from_default_env())

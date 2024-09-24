@@ -1,8 +1,9 @@
-use anyhow::Result;
-use futures::channel::oneshot::{self, Sender};
+use anyhow::{Context, Result};
+use glib_macros::clone;
 use gtk4::{prelude::*, ApplicationWindow};
-use std::cell::Cell;
 use webkit6::{prelude::*, LoadEvent, WebView};
+
+use crate::utils::runtime_oneshot;
 
 pub struct WebviewConfig {
     pub uri: String,
@@ -14,26 +15,34 @@ impl WebviewConfig {
         webview.load_uri(&self.uri);
 
         window.set_child(Some(&webview));
-        let (s, r) = oneshot::channel();
+        let (s, r) = runtime_oneshot::<Result<()>>();
+        let handle = webview.connect_load_changed(clone!(
+            #[strong]
+            s,
+            move |_webview, event| {
+                if event != LoadEvent::Finished {
+                    return;
+                }
 
-        let s: Cell<Option<Sender<()>>> = Cell::new(Some(s));
-        let handle = webview.connect_load_changed(move |_webview, event| {
-            if event != LoadEvent::Finished {
-                return;
+                // Confirm that load finished.
+                // If this gets called multiple times
+                // (which it shouldn't, since we always disconnect the handle immiedately)
+                // ignore
+                s.send(Ok(())).ok();
             }
+        ));
 
-            // Confirm that load finished.
-            // If this gets called multiple times
-            // (which it shouldn't, since we always disconnect the handle immiedately)
-            // ignore
-            if let Some(s) = s.take() {
-                s.send(()).unwrap();
-            } else {
-                tracing::warn!("connect_load_changed called multiple times. This shouldn't happen");
-            };
-        });
+        webview.connect_load_failed(clone!(
+            #[strong]
+            s,
+            move |_, _, url, err| {
+                let err = Err(err.clone()).context(format!("While loading {url}"));
+                s.send(err).unwrap();
+                false
+            }
+        ));
 
-        r.await?;
+        r.await??;
         webview.disconnect(handle);
         Ok(webview)
     }

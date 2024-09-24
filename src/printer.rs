@@ -1,10 +1,11 @@
-use anyhow::Result;
-use futures::channel::oneshot;
-use gtk4::PrintSettings;
-use std::cell::Cell;
+use anyhow::{Context, Result};
+use glib_macros::clone;
+use gtk4::{prelude::ObjectExt, PrintSettings};
 use std::path::PathBuf;
 use url::Url;
 use webkit6::{PrintOperation, WebView};
+
+use crate::utils;
 
 pub struct PrintConfig {
     output_file: PathBuf,
@@ -25,19 +26,31 @@ impl PrintConfig {
         settings.set(gtk4::PRINT_SETTINGS_OUTPUT_URI, Some(output_uri.as_str()));
         print_op.set_print_settings(&settings);
 
-        let (s, r) = oneshot::channel();
-        let s: Cell<Option<oneshot::Sender<()>>> = Cell::new(Some(s));
-        print_op.connect_finished(move |_| {
-            if let Some(s) = s.take() {
-                s.send(()).unwrap();
-            } else {
-                tracing::warn!(
-                    "print operation connect_finished called multiple times. This shouldn't happen"
-                );
-            };
-        });
+        let (s, r) = utils::runtime_oneshot();
+        let failed_signal = print_op.connect_failed(clone!(
+            #[strong]
+            s,
+            move |_, err| {
+                let err = Err(err.clone());
+                let err = err.context("Printing operation failed");
+                s.send(err).unwrap();
+            }
+        ));
+
+        let finished_signal = print_op.connect_finished(clone!(
+            #[strong]
+            s,
+            move |_| {
+                s.send(Ok(())).unwrap();
+            }
+        ));
 
         print_op.print();
-        Ok(r.await?)
+        let res = r.await;
+
+        print_op.disconnect(failed_signal);
+        print_op.disconnect(finished_signal);
+
+        res?
     }
 }
