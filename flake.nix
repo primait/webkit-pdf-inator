@@ -50,8 +50,21 @@
         };
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
         webkit-pdf-inator = craneLib.buildPackage (commonArgs // {
+          meta.mainProgram = "webkit-pdf-inator";
           inherit cargoArtifacts;
         });
+
+        dockerImage = pkgs.dockerTools.buildImage {
+          name = "webkit-pdf-inator";
+          copyToRoot = pkgs.buildEnv {
+            name = "webkit-pdf-inator-env";
+            paths = [ webkit-pdf-inator ];
+            pathsToLink = [ "/bin" ];
+          };
+          config = {
+            Cmd = [ "${lib.getExe webkit-pdf-inator}" ];
+          };
+        };
       in
       {
         checks = {
@@ -92,6 +105,7 @@
 
         packages = {
           default = webkit-pdf-inator;
+          dockerImage = dockerImage;
         };
 
         apps.default = flake-utils.lib.mkApp {
