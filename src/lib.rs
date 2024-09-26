@@ -72,11 +72,3 @@ pub fn print(args: Args) -> Result<()> {
         (_, _) => bail!("GTK app returned an exit code indicating failure"),
     }
 }
-
-#[cfg(test)]
-mod test {
-    #[test]
-    fn test_add() {
-        assert_eq!(1 + 2, 3);
-    }
-}
