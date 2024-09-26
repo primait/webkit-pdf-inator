@@ -39,3 +39,10 @@ jobs:
       - run: nix build -L ".#checks.x86_64-linux.$check"
         env:
           check: "${{ matrix.check }}"
+  alls-green:
+    if: always()
+    needs:
+      - flake-checks
+    runs-on: ubuntu-latest
+    steps:
+      - run: ${{ !contains(needs.*.result, 'failure') }}
