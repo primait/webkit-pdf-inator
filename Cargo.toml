@@ -1,0 +1,23 @@
+[package]
+name = "webkit-pdf-inator"
+version = "0.2.0"
+edition = "2021"
+
+# TODO: figure out the license
+# and publish
+license = "LicenseRef-Proprietary" 
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.89"
+clap = { version = "4.5.17", features = ["derive", "unicode"] }
+futures = "0.3.30"
+glib = { version = "0.20.3", features = ["log"] }
+glib-macros = "0.20.3"
+gtk4 = "0.9.0"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json", "ansi"] }
+url = "2.5.2"
+webkit6 = "0.4.0"

@@ -1,0 +1,43 @@
+name: CD
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "The tag name to use"
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@8887e596b4ee1134dae06b98d573bd674693f47c
+      - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b
+
+      - run: nix build .#dockerImage
+      - run: docker load -i ./result
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::193543784330:role/oidc-github-ecr-webkit-pdf-inator
+          aws-region: us-east-1
+
+      - name: Login to public ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: "true"
+          registry-type: public
+
+      - name: Push image
+        run: |-
+           docker push webkit-pdf-inator \
+           "public.ecr.aws/primaassicurazioni/webkit-pdf-inator:${{ inputs.tag_name || github.event.release.tag_name }}"
